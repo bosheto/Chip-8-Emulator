@@ -1,27 +1,30 @@
-import static com.raylib.Colors.RAYWHITE;
-import static com.raylib.Colors.VIOLET;
+import static com.raylib.Colors.*;
 import static com.raylib.Raylib.*;
 
 public class Main {
-    public static void main(String args[]) {
-        String appHomeDir = System.getenv("APP_HOME");
-        System.out.println(appHomeDir);
-        InitWindow(800, 450, "Demo");
-        SetTargetFPS(60);
-        Camera3D camera = new Camera3D()._position(new Vector3().x(18).y(16).z(18))
-                .target(new Vector3())
-                .up(new Vector3().x(0).y(1).z(0))
-                .fovy(45).projection(CAMERA_PERSPECTIVE);
 
+    static Memory mem = new Memory();
+
+    public static void main(String args[]) {
+        mem.init("test_opcode.ch8");
+//        mem.init("IBM Logo.ch8");
+
+        InitWindow(640, 320, "CHIP-8");
+        SetTargetFPS(60);
         while (!WindowShouldClose()) {
-            UpdateCamera(camera, CAMERA_ORBITAL);
+            mem.run();
             BeginDrawing();
-            ClearBackground(RAYWHITE);
-            BeginMode3D(camera);
-            DrawGrid(20, 1.0f);
-            EndMode3D();
-            DrawText("Hello world", 190, 200, 20, VIOLET);
-            DrawFPS(20, 20);
+            ClearBackground(RED);
+            int[][] screen = mem.getVRAM();
+            for(int y = 0; y < mem.getScreen_h(); y ++){
+                for(int x = 0; x < mem.getScreen_w(); x++){
+                    int color = screen[y][x];
+                    int pos_x = x * 10;
+                    int pos_y = y * 10;
+                    DrawRectangle(pos_x, pos_y, 10, 10, color == 0 ? BLACK : WHITE);
+                }
+            }
+//            DrawRectangle();
             EndDrawing();
         }
         CloseWindow();
